@@ -9,7 +9,6 @@ PostApi.list = (params) => {
 
 // 查询文章
 PostApi.get = (params) => {
-    console.info('', params)
     return axios.get('/v1/api/post/detail', {params});
 }
 

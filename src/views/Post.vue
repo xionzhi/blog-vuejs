@@ -1,14 +1,15 @@
 <template>
     <div><h1>{{ postData.title }}</h1></div>
     <div>
-        <div>{{ postData.author }}</div>
-        <div>{{ postData.create_time }}</div>
-        <div class="post-markdown">{{ postData.post_markdown}}</div>
+        <div><p>{{ this.postData.authorData.author_name }}</p></div>
+        <div>{{ postData.ctime }}</div>
+        <div class="post-markdown" v-html="compiledMarkdown"></div>
     </div>
 </template>
 
 <script>
     import PostsApi from '@/api/posts'
+    import { marked } from 'marked'
     export default {
         name: "Post",
         created: function () {
@@ -18,24 +19,35 @@
             return {
                 params: {},
                 postData: {
-                    title: "title",
-                    author: "author",
-                    create_time: "create_time",
-                    post_markdown: "post_markdown",
+                    title: "",
+                    slug: "",
+                    markdown: "",
+                    html: "",
+                    image: "",
+                    language: "",
+                    meta_title: "",
+                    meta_description: "",
+                    authorData: {
+                        author_name: ""
+                    }
                 },
             }
         },
         watch: {},
+        computed: {
+            compiledMarkdown() {
+                return marked(this.postData.markdown);
+            }
+        },
         methods: {
             GetPostDetail: function () {
                 this.params.slug = this.$route.params.slug;
-                let params = JSON.parse(JSON.stringify(this.params));
-                if (params) {
-                    PostsApi.get(params).then((response) => {
-                        if(response.data.code === 200){
+                if (this.params) {
+                    PostsApi.get(this.params).then((response) => {
+                        if(response.data.code === 200) {
                             this.postData = response.data.data;
                         }
-                        else{
+                        else {
                             console.info('http request 404');
                         }
                     })
